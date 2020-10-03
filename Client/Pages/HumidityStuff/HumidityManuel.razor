@@ -1,0 +1,61 @@
+﻿@page "/humidity/create"
+@inject HttpClient http
+@inject NavigationManager uriHelper
+@inject IJSRuntime js
+
+<article>
+    <h3>Create humidity</h3>
+
+    <HumidityForm ButtonText="Create Humidity" Humidity="@humidity"
+                  OnValidSubmit="@CreateHumidity"></HumidityForm>
+</article>
+
+<br />
+<br />
+<br />
+
+<article>
+    <h3>Set humidity scale</h3>
+    <section>
+        <label>Lowest number:</label>
+        <input @bind-value="HumidityScale.Lowest" />
+    </section>
+
+    <section>
+        <label>Highest number:</label>
+        <input @bind-value="HumidityScale.Highest" />
+    </section>
+</article>
+
+<br />
+<br />
+<br />
+
+<article>
+    <h3>Delete old data from database</h3>
+    <button class="btn btn-danger" @onclick="CleanDatabase">Delete</button>
+</article>
+
+
+
+@code {
+
+    Humidity humidity = new Humidity();
+    async Task CreateHumidity()
+    {
+        if (humidity.Measuring >= 0)
+        {
+
+            await http.PostAsJsonAsync("api/humidity/one", humidity);
+            await js.InvokeVoidAsync("alert", $"Created Successfully!");
+            uriHelper.NavigateTo("humidity/create");
+        }
+
+    }
+
+    async Task CleanDatabase()
+    {
+        await http.DeleteAsync("api/humidity");
+        await js.InvokeVoidAsync("alert", $"Deleted Successfully!");
+    }
+}

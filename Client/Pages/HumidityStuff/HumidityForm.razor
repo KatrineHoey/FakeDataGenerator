@@ -1,0 +1,21 @@
+﻿<EditForm Model="@Humidity" OnValidSubmit="@OnValidSubmit">
+    <DataAnnotationsValidator />
+    <div class="form-group">
+        <label>Humidity Measuring:</label>
+        <div>
+            <InputNumber @bind-Value="@Humidity.Measuring" />
+            <ValidationMessage For="@(() => Humidity.Measuring)" />
+        </div>
+    </div>
+    <button type="submit" class="btn btn-success">
+        @ButtonText
+    </button>
+
+</EditForm>
+
+
+@code {
+    [Parameter] public Humidity Humidity { get; set; }
+    [Parameter] public string ButtonText { get; set; } = "Save";
+    [Parameter] public EventCallback OnValidSubmit { get; set; }
+}
