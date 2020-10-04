@@ -17,16 +17,41 @@ namespace FakeDataGenerator.Server.Data
                 serviceProvider.GetRequiredService<DbContextOptions<VentilationDBContext>>()))
             {
                 context.Database.EnsureCreated();
-                // Look for any heroes.
+
                 if (context.humidities.Any())
                 {
                     return;   // Data was already seeded
                 }
 
                 context.humidities.AddRange(
-                    new Humidity(),
-                    new Humidity());
+                    new Humidity(1),
+                    new Humidity(1));
                     
+
+                context.SaveChanges();
+            }
+
+
+
+        }
+
+        public static void InitializeSensors(IServiceProvider serviceProvider)
+        {
+            using (var context = new VentilationDBContext(
+                serviceProvider.GetRequiredService<DbContextOptions<VentilationDBContext>>()))
+            {
+                context.Database.EnsureCreated();
+
+                if (context.sensors.Any())
+                {
+                    return;   // Data was already seeded
+                }
+
+                context.sensors.AddRange(
+                    new Sensor(DataTypeEnum.Humidity, "H1", "%"),
+                    new Sensor(DataTypeEnum.Humidity, "H2", "%"),
+                    new Sensor(DataTypeEnum.Humidity, "H3", "%"));
+
 
                 context.SaveChanges();
             }

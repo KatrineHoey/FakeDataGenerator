@@ -2,6 +2,7 @@
 using FakeDataGenerator.Server.Interfaces;
 using FakeDataGenerator.Shared;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,22 +15,24 @@ namespace FakeDataGenerator.Server.Services
     {
         private readonly VentilationDBContext _ventilationDBContext;
 
-        private static bool IsOn = false;
-
         public HumidityService(VentilationDBContext ventilationDBContext)
         {
             _ventilationDBContext = ventilationDBContext;
         }
 
-        public async Task<bool> CreateHumidities(bool on)
+        public async Task<bool> CreateHumidities(Sensor sensor)
         {
-            IsOn = on;
-            while (IsOn == true)
+            bool isOn = sensor.IsOn;
+            while (isOn == true)
             {
-                Humidity humidity = new Humidity();
+
+                Humidity humidity = new Humidity(sensor.SensorId);
                 _ventilationDBContext.humidities.Add(humidity);
                 await _ventilationDBContext.SaveChangesAsync();
                 Thread.Sleep(5000);
+
+                var x = _ventilationDBContext.sensors.AsNoTracking().Where(x => x.SensorId == sensor.SensorId).FirstOrDefault();
+                isOn = x.IsOn;
             }
 
             return true;
@@ -40,7 +43,7 @@ namespace FakeDataGenerator.Server.Services
             _ventilationDBContext.humidities.Add(humidity);
             await _ventilationDBContext.SaveChangesAsync();
 
-            return humidity.Id;
+            return humidity.SensorMeasureId;
         }
 
         public async Task<bool> CleanDatabase()

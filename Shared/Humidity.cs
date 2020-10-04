@@ -7,24 +7,20 @@ using System.Text;
 
 namespace FakeDataGenerator.Shared
 {
-    public class Humidity
+    public class Humidity : SensorMeasure
     {
-        [Key]
-        public Guid Id { get; private set; }
-        public int Measuring { get; set; }
-        public DateTime DateCreated { get; private set; }
-        public DataTypeEnum DataType { get; private set; }
+
+        public Humidity(int sensorId) : base(sensorId)
+        {
+            Measuring = GenerateMeasuring();
+        }
 
         public Humidity()
         {
-            Measuring = GenerateMeasuringForHumidity();
-            DateCreated = DateTime.Now.ToLocalTime();
-            DataType = DataTypeEnum.Humidity;
+
         }
 
-
-       
-        private int GenerateMeasuringForHumidity()
+        protected override int GenerateMeasuring()
         {
             Random random = new Random();
             return random.Next(HumidityScale.Lowest, HumidityScale.Highest);

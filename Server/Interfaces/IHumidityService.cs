@@ -8,7 +8,7 @@ namespace FakeDataGenerator.Server.Interfaces
 {
     public interface IHumidityService
     {
-        Task<bool> CreateHumidities(bool on);
+        Task<bool> CreateHumidities(Sensor sensor);
 
         Task<Guid> CreateHumidity(Humidity humidity);
         Task<bool> CleanDatabase();

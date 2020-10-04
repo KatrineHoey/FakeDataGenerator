@@ -15,5 +15,14 @@ namespace FakeDataGenerator.Server.Data
         }
 
         public DbSet<Humidity> humidities { get; set; }
+
+        public DbSet<Sensor> sensors { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<SensorMeasure>()
+                .HasOne(p => p.Sensor)
+                .WithMany(b => b.SensorMeasures);
+        }
     }
 }

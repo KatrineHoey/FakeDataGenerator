@@ -16,23 +16,21 @@ namespace FakeDataGenerator.Server.Controllers
     public class HumidityController : ControllerBase
     {
         private readonly IHumidityService _humidityService;
-        public HumidityController(IHumidityService humidityService)
+        private readonly ISensorService _sensorService;
+        public HumidityController(IHumidityService humidityService, ISensorService sensorService)
         {
             _humidityService = humidityService;
+            _sensorService = sensorService;
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateHumidities([FromBody] int on)
+        public async Task<IActionResult> CreateHumidities(Sensor sensor)
         {
             try
             {
-                bool isOn;
-                if (on == 1) isOn = true;
-                else isOn = false;
-
-                return Ok(await _humidityService.CreateHumidities(isOn));
-
-                
+                await _sensorService.UpdateSensor(sensor);
+                return Ok(await _humidityService.CreateHumidities(sensor));
+  
             }
             catch (Exception e)
             {

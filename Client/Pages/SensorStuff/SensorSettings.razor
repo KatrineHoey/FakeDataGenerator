@@ -1,0 +1,72 @@
+﻿@page "/sensor/settings"
+@inject HttpClient http
+@inject IJSRuntime js
+
+<h3>SensorSettings</h3>
+
+<br />
+<br />
+
+<article>
+    <CreateSensor></CreateSensor>
+</article>
+
+<br />
+<br />
+
+@if (sensors == null)
+{
+    <text>Loading...</text>
+}
+else if (sensors.Count == 0)
+{
+    <text>No Records Found.</text>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Type</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (Sensor item in sensors)
+            {
+                <tr>
+                    <td>@item.SensorId</td>
+                    <td>@item.Name</td>
+                    <td>@item.DataType</td>
+                    <td>
+                        <a class="btn btn-success" href="sensor/edit/@item.SensorId">Edit</a>
+                        <button class="btn btn-danger" @onclick="@(() => Delete(item.SensorId))">X</button>
+                    </td>
+                </tr>
+            }
+
+        </tbody>
+    </table>
+}
+
+
+@code {
+    Sensor sensor = new Sensor();
+    List<Sensor> sensors { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        sensors = (await http.GetFromJsonAsync<List<Sensor>>("api/sensor")).ToList();
+    }
+
+    async Task Delete(int sensorId)
+    {
+        var sensor = sensors.First(x => x.SensorId == sensorId);
+        if (await js.InvokeAsync<bool>("confirm", $"Do you want to delete {sensor.Name}'s ({sensor.SensorId}) Record?"))
+        {
+            await http.DeleteAsync($"api/sensor/{sensorId}");
+            await OnInitializedAsync();
+        }
+    }
+}

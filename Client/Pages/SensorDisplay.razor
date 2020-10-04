@@ -1,0 +1,112 @@
+﻿@inject HttpClient http
+@inject NavigationManager uriHelper
+@inject IJSRuntime js
+
+<h3>Humidity</h3>
+@if (sensors == null)
+{
+    <text>Loading...</text>
+}
+else if (sensors.Count == 0)
+{
+    <text>No Records Found.</text>
+}
+else
+{
+    <table class="table ">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Turn on/off</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in sensors)
+            {
+                <tr>
+                    <td>@item.SensorId</td>
+                    <td>@item.Name</td>
+                    <td>@item.DataType</td>
+                    <td>
+                        @if (item.IsOn == false)
+                        {
+                            <button class="btn btn-danger" @onclick="@(() => StartHumidityDataGenerator(item))">Start</button>
+
+                            <button class="btn btn-success" @onclick="@(() => StopHumidityDataGenerator(item))">Stop</button>
+                        }
+                        else
+                        {
+                            <button class="btn btn-success" @onclick="@(() => StartHumidityDataGenerator(item))">Start</button>
+
+                            <button class="btn btn-danger" @onclick="@(() => StopHumidityDataGenerator(item))">Stop</button>
+                        }
+                    </td>
+                   
+                </tr>
+            }
+
+        </tbody>
+    </table>
+}
+
+
+
+
+
+@code {
+    public List<Sensor> sensors { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            await GetSensors();
+        }
+        catch (Exception e)
+        {
+
+            throw e;
+        }
+
+    }
+
+    private async Task GetSensors()
+    {
+        var x = (await http.GetFromJsonAsync<List<Sensor>>("api/sensor")).ToList();
+        sensors = x;
+    }
+
+    async Task StartHumidityDataGenerator(Sensor item)
+    {
+        if (item.IsOn == false)
+        {
+            item.IsOn = true;
+            await http.PostAsJsonAsync("api/humidity", item);
+            await GetSensors();
+        }
+        else
+        {
+            await js.InvokeVoidAsync("alert", $"Generator is already started!");
+        }
+
+    }
+
+    async Task StopHumidityDataGenerator(Sensor item)
+    {
+
+        if (item.IsOn == true)
+        {
+            item.IsOn = false;
+            await http.PostAsJsonAsync("api/humidity", item);
+            await GetSensors();
+        }
+        else
+        {
+            await js.InvokeVoidAsync("alert", $"Generator is already stopped!");
+        }
+    }
+
+}

@@ -1,12 +1,28 @@
-﻿<EditForm Model="@Humidity" OnValidSubmit="@OnValidSubmit">
+﻿@inject HttpClient http
+
+<EditForm Model="@Humidity" OnValidSubmit="@OnValidSubmit">
     <DataAnnotationsValidator />
-    <div class="form-group">
-        <label>Humidity Measuring:</label>
-        <div>
+    <section class="form-group row">
+
+        <article class="col-2">
+            <label>Humidity Measuring:</label>
             <InputNumber @bind-Value="@Humidity.Measuring" />
             <ValidationMessage For="@(() => Humidity.Measuring)" />
-        </div>
-    </div>
+        </article>
+        <article class="col-2">
+            <label>Choose sensor:</label>
+            <select class="form-control" @bind="@Humidity.SensorId">
+
+                <option value=""></option>
+                @foreach (var item in sensors)
+                {
+                    <option value="@item.SensorId"> @item.Name </option>
+                }
+
+
+            </select>
+        </article>
+    </section>
     <button type="submit" class="btn btn-success">
         @ButtonText
     </button>
@@ -18,4 +34,21 @@
     [Parameter] public Humidity Humidity { get; set; }
     [Parameter] public string ButtonText { get; set; } = "Save";
     [Parameter] public EventCallback OnValidSubmit { get; set; }
+
+    List<Sensor> sensors = new List<Sensor>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var x = (await http.GetFromJsonAsync<List<Sensor>>("api/sensor")).ToList();
+            sensors = x;
+        }
+        catch (Exception e)
+        {
+
+            throw e;
+        }
+
+    }
 }

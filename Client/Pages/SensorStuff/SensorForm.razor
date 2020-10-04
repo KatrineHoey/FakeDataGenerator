@@ -1,0 +1,39 @@
+﻿@inject HttpClient http
+
+<EditForm Model="@Sensor" OnValidSubmit="@OnValidSubmit">
+    <DataAnnotationsValidator />
+    <section class="form-group">
+
+        <article>
+            <label class="col col-2">Sensorname:</label>
+            <InputText @bind-Value="@Sensor.Name" />
+            <ValidationMessage For="@(() => Sensor.Name)" />
+        </article>
+        <article>
+            <label class="col col-2">Datatype:</label>
+            <InputSelect @bind-Value="Sensor.DataType">
+                @foreach (var value in Enum.GetValues(typeof(DataTypeEnum)))
+                {
+                    <option>@value</option>
+                }
+            </InputSelect>
+        </article>
+        <article>
+            <label class="col col-2">Measuringunit:</label>
+            <InputText @bind-Value="@Sensor.MeasuringUnit" />
+            <ValidationMessage For="@(() => Sensor.MeasuringUnit)" />
+        </article>
+    </section>
+    <button type="submit" class="btn btn-success">
+        @ButtonText
+    </button>
+
+</EditForm>
+
+
+@code {
+    [Parameter] public Sensor Sensor { get; set; }
+    [Parameter] public string ButtonText { get; set; } = "Save";
+    [Parameter] public EventCallback OnValidSubmit { get; set; }
+
+}

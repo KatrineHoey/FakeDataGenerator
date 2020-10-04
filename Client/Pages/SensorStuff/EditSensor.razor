@@ -1,0 +1,32 @@
+﻿@page "/sensor/edit/{SensorId:int}"
+@inject HttpClient http
+@inject NavigationManager uriHelper
+@inject IJSRuntime js
+
+<h3>Edit sensor</h3>
+
+<SensorForm ButtonText="Edit sensor" Sensor="@sensor"
+            OnValidSubmit="@UpdateSensor" />
+
+@code {
+    [Parameter] 
+    public int SensorId { get; set; }
+
+    Sensor sensor = new Sensor();
+
+    protected async override Task OnParametersSetAsync()
+    {
+        sensor = await http.GetFromJsonAsync<Sensor>($"api/Sensor/{SensorId}");
+    }
+
+    async Task UpdateSensor()
+    {
+        if (!string.IsNullOrWhiteSpace(sensor.Name) && !string.IsNullOrWhiteSpace(sensor.MeasuringUnit))
+        {
+
+            await http.PutAsJsonAsync("api/Sensor", sensor);
+            await js.InvokeVoidAsync("alert", $"Updated Successfully!");
+            uriHelper.NavigateTo("sensor/settings");
+        }
+    }
+}

@@ -27,6 +27,7 @@ namespace FakeDataGenerator.Server
 
 
                 //4. Call the DataGenerator to create sample data
+                SeedData.InitializeSensors(services);
                 SeedData.InitializeHumidity(services);
             }
 
